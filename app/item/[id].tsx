@@ -38,7 +38,7 @@ export default function ItemDetailScreen() {
       { text: 'Annuler', style: 'cancel' },
       {
         text: 'Supprimer', style: 'destructive',
-        onPress: async () => { await deleteItem(item.id); router.back(); },
+        onPress: async () => { await deleteItem(item!.id); router.back(); },
       },
     ]);
   }
@@ -78,7 +78,7 @@ export default function ItemDetailScreen() {
 
         {/* Content card */}
         <View style={{ marginTop: -26, backgroundColor: theme.cream, borderRadius: 26, padding: 22 }}>
-          <Eyebrow theme={theme} style={{ marginBottom: 7 }}>{item.brand}</Eyebrow>
+          <Eyebrow theme={theme} style={{ marginBottom: 7 }}>{item.brand ?? ''}</Eyebrow>
           <Text style={{ fontSize: 25, fontFamily: 'Newsreader_500Medium', color: theme.ink, lineHeight: 29, marginBottom: 12 }}>
             {item.name}
           </Text>

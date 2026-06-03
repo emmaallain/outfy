@@ -60,4 +60,4 @@ export const THEMES = {
   },
 } as const;
 
-export type Theme = typeof THEMES.creme;
+export type Theme = typeof THEMES[keyof typeof THEMES];

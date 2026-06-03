@@ -34,7 +34,7 @@ function RootNav() {
   return (
     <>
       <StatusBar style={theme.statusBar} />
-      <Stack screenOptions={{ headerShown: false, animation: 'ios' }}>
+      <Stack screenOptions={{ headerShown: false, animation: 'slide_from_right' }}>
         <Stack.Screen name="(auth)" />
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="item/[id]" options={{ presentation: 'card' }} />
