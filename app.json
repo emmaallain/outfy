@@ -1,0 +1,58 @@
+{
+  "expo": {
+    "name": "Outfy",
+    "slug": "outfy",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "scheme": "outfy",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "backgroundColor": "#F1E9E0"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "fr.outfy.app",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Outfy utilise la caméra pour scanner tes vêtements.",
+        "NSPhotoLibraryUsageDescription": "Outfy accède à ta galerie pour ajouter des photos.",
+        "NSMotionUsageDescription": "Outfy adapte le thème à la luminosité ambiante."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#F1E9E0"
+      },
+      "package": "fr.outfy.app",
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE"
+      ]
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Outfy utilise la caméra pour scanner les codes-barres."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Outfy accède à ta galerie pour tes photos d'articles."
+        }
+      ],
+      "expo-asset"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

@@ -1,70 +1,70 @@
-# Getting Started with Create React App
+# Outfy — Application React Native
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Garde-robe intelligente : composer ses tenues dans son lit, scanner ses pièces, partager avec ses amies.
 
-## Available Scripts
+## Stack
 
-In the project directory, you can run:
+- **React Native** + **Expo SDK 52** + **Expo Router v4** (navigation fichier-based)
+- **Supabase** — auth, base de données, stockage photos
+- **UPCitemDB** + **Open Beauty Facts** — lookup produit via code-barre
+- **expo-sensors** `LightSensor` — thème adaptatif (crème le jour / nuit en basse luminosité)
+- **expo-camera** — scan de codes-barres intégré
 
-### `npm start`
+## Installation
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+```bash
+cd outfy-app
+npm install
+# Copier .env.example → .env.local et renseigner les clés Supabase
+cp .env.example .env.local
+npx expo start
+```
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Variables d'environnement (`.env.local`)
 
-### `npm test`
+```
+EXPO_PUBLIC_SUPABASE_URL=https://xxxx.supabase.co
+EXPO_PUBLIC_SUPABASE_ANON_KEY=eyJhbG...
+EXPO_PUBLIC_UPCITEMDB_KEY=trial   # ou ta clé si compte UPCitemDB
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Setup Supabase
 
-### `npm run build`
+1. Créer un projet sur [supabase.com](https://supabase.com)
+2. SQL Editor → coller `supabase/migrations/001_schema.sql` → Run
+3. Storage → créer un bucket `item-photos` (public, 5 MB max)
+4. Authentication → Email confirmations : désactiver pour dev
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Thème adaptatif
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+| Condition | Thème |
+|---|---|
+| Android avec capteur lumière < 40 lux | **Nuit** (fond sombre) |
+| iOS dark mode système | **Nuit** |
+| Heure < 7h ou > 20h (fallback) | **Nuit** |
+| Sinon | **Crème** (fond clair) |
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## APIs produits
 
-### `npm run eject`
+| API | Usage | Limite gratuite |
+|---|---|---|
+| Open Beauty Facts | Maquillage, parfums, cosmétiques | Illimitée |
+| UPCitemDB (trial) | Vêtements, chaussures, accessoires | 100 req/jour |
+| Open Food Facts | Fallback généraliste | Illimitée |
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## Structure
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+```
+app/
+  _layout.tsx          # Root : providers + navigation guard
+  (auth)/              # Login / Signup
+  (tabs)/              # Onglets : Accueil, Dressing, Scanner, Profil
+  item/[id].tsx        # Fiche article
+  item/add.tsx         # Ajouter / modifier une pièce
+  outfit/create.tsx    # Composer une tenue
+  friend/[id].tsx      # Garde-robe d'une amie
+context/               # ThemeContext (adaptatif) + AuthContext
+hooks/                 # useWardrobe, useOutfits, useFeed…
+lib/                   # supabase.ts, apis.ts, theme.ts, types.ts
+supabase/migrations/   # Schéma SQL complet
+```
