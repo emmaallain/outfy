@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import {
-  View, Text, TextInput, TouchableOpacity, StyleSheet,
-  KeyboardAvoidingView, Platform, ActivityIndicator, ScrollView,
+  View, Text, TextInput, TouchableOpacity,
+  KeyboardAvoidingView, Platform, ActivityIndicator, ScrollView, Modal,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
@@ -16,6 +17,7 @@ export default function SignupScreen() {
   const [username, setUsername] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showEmailSent, setShowEmailSent] = useState(false);
 
   async function handleSignup() {
     setError('');
@@ -23,11 +25,40 @@ export default function SignupScreen() {
     setLoading(true);
     const err = await signUp(email.trim(), password, username.trim());
     setLoading(false);
-    if (err) setError(err);
+    if (err) {
+      setError(err);
+    } else {
+      setShowEmailSent(true);
+    }
   }
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.cream }}>
+      {/* Email envoyé popup */}
+      <Modal visible={showEmailSent} transparent animationType="fade">
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', padding: 28 }}>
+          <View style={{ backgroundColor: theme.paper, borderRadius: 24, padding: 28, alignItems: 'center', gap: 14, width: '100%' }}>
+            <View style={{ width: 64, height: 64, borderRadius: 32, backgroundColor: theme.orangeSoft, alignItems: 'center', justifyContent: 'center' }}>
+              <Ionicons name="mail-outline" size={32} color={theme.orange} />
+            </View>
+            <Text style={{ fontSize: 22, fontFamily: 'Newsreader_500Medium', color: theme.ink, textAlign: 'center' }}>
+              Email envoyé !
+            </Text>
+            <Text style={{ fontSize: 14, color: theme.ink2, textAlign: 'center', lineHeight: 21 }}>
+              Un lien de confirmation a été envoyé à{'\n'}
+              <Text style={{ fontWeight: '700', color: theme.ink }}>{email}</Text>.{'\n\n'}
+              Consulte ta boîte mail et clique sur le lien pour activer ton compte.
+            </Text>
+            <TouchableOpacity
+              onPress={() => { setShowEmailSent(false); router.replace('/(auth)/login'); }}
+              activeOpacity={0.85}
+              style={{ backgroundColor: theme.orange, borderRadius: 14, paddingVertical: 14, width: '100%', alignItems: 'center', shadowColor: theme.orange, shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.3, shadowRadius: 12, elevation: 5, marginTop: 4 }}
+            >
+              <Text style={{ color: '#fff', fontWeight: '700', fontSize: 15 }}>Compris, aller à la connexion</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={{ flex: 1, paddingHorizontal: 24, paddingTop: 80, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
           <TouchableOpacity onPress={() => router.back()} style={{ marginBottom: 32 }}>

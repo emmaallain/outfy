@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import {
   View, Text, ScrollView, TextInput, TouchableOpacity,
-  ActivityIndicator, Alert,
+  ActivityIndicator, Alert, Modal,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -14,6 +14,18 @@ import { supabase } from '../../lib/supabase';
 import { Category, CATEGORY_META, OCCASIONS, Occasion } from '../../lib/types';
 
 const CATS = Object.keys(CATEGORY_META) as Category[];
+const LETTER_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
+const NUMERIC_SIZES = Array.from({ length: 15 }, (_, i) => String(34 + i));
+
+// Defined outside component to prevent focus loss on re-render
+function Field({ label, theme, children }: { label: string; theme: any; children: React.ReactNode }) {
+  return (
+    <View style={{ gap: 6 }}>
+      <Text style={{ fontSize: 12, fontWeight: '700', color: theme.ink3, letterSpacing: 0.8, textTransform: 'uppercase' }}>{label}</Text>
+      {children}
+    </View>
+  );
+}
 
 export default function AddItemScreen() {
   const { theme } = useTheme();
@@ -28,6 +40,8 @@ export default function AddItemScreen() {
   const [category, setCategory] = useState<Category>('vetements');
   const [subcategory, setSubcategory] = useState('');
   const [size, setSize] = useState('');
+  const [showSizePicker, setShowSizePicker] = useState(false);
+  const [customSize, setCustomSize] = useState('');
   const [color, setColor] = useState('');
   const [collection, setCollection] = useState('');
   const [link, setLink] = useState('');
@@ -101,13 +115,6 @@ export default function AddItemScreen() {
     router.back();
   }
 
-  const Field = ({ label, children }: { label: string; children: React.ReactNode }) => (
-    <View style={{ gap: 6 }}>
-      <Text style={{ fontSize: 12, fontWeight: '700', color: theme.ink3, letterSpacing: 0.8, textTransform: 'uppercase' }}>{label}</Text>
-      {children}
-    </View>
-  );
-
   const inputStyle = {
     backgroundColor: theme.paper, borderRadius: 14, paddingHorizontal: 16, paddingVertical: 13,
     fontSize: 15, color: theme.ink, ...theme.shadow,
@@ -115,6 +122,75 @@ export default function AddItemScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.cream }}>
+      {/* Size picker modal */}
+      <Modal visible={showSizePicker} transparent animationType="slide">
+        <View style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.45)' }}>
+          <View style={{ backgroundColor: theme.cream, borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 24, paddingBottom: insets.bottom + 24, gap: 20 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+              <Text style={{ fontSize: 19, fontFamily: 'Newsreader_500Medium', color: theme.ink }}>Choisir une taille</Text>
+              <TouchableOpacity onPress={() => setShowSizePicker(false)} activeOpacity={0.7}>
+                <Ionicons name="close" size={24} color={theme.ink2} />
+              </TouchableOpacity>
+            </View>
+
+            {/* Letter sizes */}
+            <View style={{ gap: 8 }}>
+              <Text style={{ fontSize: 11, fontWeight: '700', color: theme.ink3, letterSpacing: 0.8, textTransform: 'uppercase' }}>Standard</Text>
+              <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
+                {LETTER_SIZES.map(s => (
+                  <TouchableOpacity
+                    key={s}
+                    onPress={() => { setSize(s); setShowSizePicker(false); }}
+                    activeOpacity={0.75}
+                    style={{ paddingHorizontal: 18, paddingVertical: 11, borderRadius: 12, backgroundColor: size === s ? theme.ink : theme.paper, ...theme.shadow }}
+                  >
+                    <Text style={{ fontWeight: '700', fontSize: 15, color: size === s ? theme.cream : theme.ink }}>{s}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+
+            {/* Numeric sizes */}
+            <View style={{ gap: 8 }}>
+              <Text style={{ fontSize: 11, fontWeight: '700', color: theme.ink3, letterSpacing: 0.8, textTransform: 'uppercase' }}>Numérique (34 – 48)</Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+                {NUMERIC_SIZES.map(s => (
+                  <TouchableOpacity
+                    key={s}
+                    onPress={() => { setSize(s); setShowSizePicker(false); }}
+                    activeOpacity={0.75}
+                    style={{ width: 50, height: 50, borderRadius: 12, backgroundColor: size === s ? theme.ink : theme.paper, alignItems: 'center', justifyContent: 'center', ...theme.shadow }}
+                  >
+                    <Text style={{ fontWeight: '700', fontSize: 13, color: size === s ? theme.cream : theme.ink }}>{s}</Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            </View>
+
+            {/* Custom size */}
+            <View style={{ gap: 8 }}>
+              <Text style={{ fontSize: 11, fontWeight: '700', color: theme.ink3, letterSpacing: 0.8, textTransform: 'uppercase' }}>Autre / Sur-mesure</Text>
+              <View style={{ flexDirection: 'row', gap: 10 }}>
+                <TextInput
+                  style={{ flex: 1, backgroundColor: theme.paper, borderRadius: 14, paddingHorizontal: 16, paddingVertical: 13, fontSize: 15, color: theme.ink, ...theme.shadow }}
+                  placeholder="EU 40, US 8, 175cm…"
+                  placeholderTextColor={theme.ink3}
+                  value={customSize}
+                  onChangeText={setCustomSize}
+                />
+                <TouchableOpacity
+                  onPress={() => { if (customSize.trim()) { setSize(customSize.trim()); setCustomSize(''); setShowSizePicker(false); } }}
+                  activeOpacity={0.85}
+                  style={{ backgroundColor: theme.orange, borderRadius: 14, paddingHorizontal: 18, alignItems: 'center', justifyContent: 'center' }}
+                >
+                  <Text style={{ color: '#fff', fontWeight: '700', fontSize: 15 }}>OK</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 120, paddingTop: insets.top + 8 }}>
         {/* Header */}
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 20, marginBottom: 24 }}>
@@ -134,7 +210,7 @@ export default function AddItemScreen() {
             style={{ height: 200, backgroundColor: theme.paper, borderRadius: 20, alignItems: 'center', justifyContent: 'center', overflow: 'hidden', ...theme.shadow }}
           >
             {photoUri
-              ? null /* <Image source={{ uri: photoUri }} style={{ width: '100%', height: '100%' }} resizeMode="cover" /> */
+              ? null
               : (
                 <View style={{ alignItems: 'center', gap: 10 }}>
                   <View style={{ width: 56, height: 56, borderRadius: 28, backgroundColor: theme.orangeSoft, alignItems: 'center', justifyContent: 'center' }}>
@@ -146,7 +222,7 @@ export default function AddItemScreen() {
             }
           </TouchableOpacity>
 
-          <Field label="Catégorie">
+          <Field label="Catégorie" theme={theme}>
             <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
               {CATS.map(cat => (
                 <TouchableOpacity
@@ -163,40 +239,48 @@ export default function AddItemScreen() {
             </View>
           </Field>
 
-          <Field label="Nom *">
+          <Field label="Nom *" theme={theme}>
             <TextInput style={inputStyle} placeholder="ex: Blazer oversize" placeholderTextColor={theme.ink3} value={name} onChangeText={setName} />
           </Field>
 
-          <Field label="Marque">
+          <Field label="Marque" theme={theme}>
             <TextInput style={inputStyle} placeholder="ex: Zara, Sézane…" placeholderTextColor={theme.ink3} value={brand} onChangeText={setBrand} />
           </Field>
 
           <View style={{ flexDirection: 'row', gap: 12 }}>
             <View style={{ flex: 1 }}>
-              <Field label="Taille">
-                <TextInput style={inputStyle} placeholder="M, 38, EU 40…" placeholderTextColor={theme.ink3} value={size} onChangeText={setSize} />
+              <Field label="Taille" theme={theme}>
+                <TouchableOpacity
+                  onPress={() => setShowSizePicker(true)}
+                  activeOpacity={0.75}
+                  style={[inputStyle, { justifyContent: 'center' }]}
+                >
+                  <Text style={{ fontSize: 15, color: size ? theme.ink : theme.ink3 }}>
+                    {size || 'Choisir…'}
+                  </Text>
+                </TouchableOpacity>
               </Field>
             </View>
             <View style={{ flex: 1 }}>
-              <Field label="Couleur">
+              <Field label="Couleur" theme={theme}>
                 <TextInput style={inputStyle} placeholder="Noir, Beige…" placeholderTextColor={theme.ink3} value={color} onChangeText={setColor} />
               </Field>
             </View>
           </View>
 
-          <Field label="Collection / Référence">
+          <Field label="Collection / Référence" theme={theme}>
             <TextInput style={inputStyle} placeholder="ex: Printemps 2024" placeholderTextColor={theme.ink3} value={collection} onChangeText={setCollection} />
           </Field>
 
           <View style={{ flexDirection: 'row', gap: 12 }}>
             <View style={{ flex: 1 }}>
-              <Field label="Année d'achat">
+              <Field label="Année d'achat" theme={theme}>
                 <TextInput style={inputStyle} placeholder="2024" placeholderTextColor={theme.ink3} value={purchaseYear} onChangeText={setPurchaseYear} keyboardType="number-pad" maxLength={4} />
               </Field>
             </View>
             {(category === 'maquillage') && (
               <View style={{ flex: 1 }}>
-                <Field label="Expiration">
+                <Field label="Expiration" theme={theme}>
                   <TextInput style={inputStyle} placeholder="MM/AAAA" placeholderTextColor={theme.ink3} value={expiryDate} onChangeText={setExpiryDate} />
                 </Field>
               </View>
@@ -204,7 +288,7 @@ export default function AddItemScreen() {
           </View>
 
           {/* Rating */}
-          <Field label="Note">
+          <Field label="Note" theme={theme}>
             <View style={{ flexDirection: 'row', gap: 6 }}>
               {[1, 2, 3, 4, 5].map(n => (
                 <TouchableOpacity key={n} onPress={() => setRating(n === rating ? 0 : n)} activeOpacity={0.7}>
@@ -215,7 +299,7 @@ export default function AddItemScreen() {
           </Field>
 
           {/* Occasions */}
-          <Field label="Occasions">
+          <Field label="Occasions" theme={theme}>
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
               {OCCASIONS.map(({ id, label }) => {
                 const on = selectedOccs.includes(id);
@@ -233,11 +317,11 @@ export default function AddItemScreen() {
             </View>
           </Field>
 
-          <Field label="Lien (boutique, e-shop…)">
+          <Field label="Lien (boutique, e-shop…)" theme={theme}>
             <TextInput style={inputStyle} placeholder="https://…" placeholderTextColor={theme.ink3} value={link} onChangeText={setLink} autoCapitalize="none" keyboardType="url" />
           </Field>
 
-          <Field label="Notes personnelles">
+          <Field label="Notes personnelles" theme={theme}>
             <TextInput
               style={[inputStyle, { minHeight: 80, textAlignVertical: 'top', paddingTop: 13 }]}
               placeholder="Ce que tu veux retenir sur cette pièce…"

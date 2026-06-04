@@ -53,7 +53,7 @@ export default function ProfileScreen() {
               {[
                 [items.length, 'pièces'],
                 [0, 'tenues'],
-                [friends.length, 'amies'],
+                [friends.length, 'ami·es'],
               ].map(([n, l]) => (
                 <View key={String(l)} style={{ alignItems: 'center' }}>
                   <Text style={{ fontSize: 21, fontFamily: 'Newsreader_500Medium', color: theme.ink }}>{n}</Text>
@@ -74,7 +74,7 @@ export default function ProfileScreen() {
 
         {/* Tabs */}
         <View style={{ flexDirection: 'row', gap: 4, backgroundColor: theme.surfaceSunken, borderRadius: 14, padding: 4, margin: '4%', marginTop: 22 }}>
-          {([['wardrobe', 'Ma garde-robe'], ['friends', 'Mes amies']] as const).map(([id, label]) => (
+          {([['wardrobe', 'Ma garde-robe'], ['friends', 'Mes ami·es']] as const).map(([id, label]) => (
             <TouchableOpacity
               key={id}
               onPress={() => setTab(id)}
@@ -108,7 +108,7 @@ export default function ProfileScreen() {
         ) : (
           <View style={{ paddingHorizontal: 20 }}>
             <Text style={{ fontSize: 12.5, color: theme.ink2, marginBottom: 14, lineHeight: 19 }}>
-              Seules tes amies peuvent consulter ta garde-robe — et toi la leur. Confidentiel par défaut.
+              Seul·es tes ami·es peuvent consulter ta garde-robe — et toi la leur. Confidentiel par défaut.
             </Text>
             <View style={{ gap: 11 }}>
               {friends.map(f => (
@@ -141,7 +141,7 @@ export default function ProfileScreen() {
                 <View style={{ width: 46, height: 46, borderRadius: 23, backgroundColor: theme.surfaceSunken, alignItems: 'center', justifyContent: 'center' }}>
                   <Ionicons name="person-add-outline" size={22} color={theme.ink2} />
                 </View>
-                <Text style={{ fontWeight: '700', fontSize: 14, color: theme.ink2 }}>Inviter une amie</Text>
+                <Text style={{ fontWeight: '700', fontSize: 14, color: theme.ink2 }}>Inviter un·e ami·e</Text>
               </TouchableOpacity>
             </View>
           </View>

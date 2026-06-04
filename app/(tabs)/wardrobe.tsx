@@ -17,13 +17,15 @@ export default function WardrobeScreen() {
   const { cat: initCat } = useLocalSearchParams<{ cat?: Category }>();
 
   const [tab, setTab] = useState<'pieces' | 'wishlist'>('pieces');
+  const [activeCat, setActiveCat] = useState<Category | 'tout'>('tout');
   const [occ, setOcc] = useState('Tout');
 
   const { items, loading } = useWardrobe();
   const { items: wishlist } = useWishlist();
 
   const filtered = items.filter(i =>
-    occ === 'Tout' || (i.occasions ?? []).includes(occ as any)
+    (activeCat === 'tout' || i.category === activeCat) &&
+    (occ === 'Tout' || (i.occasions ?? []).includes(occ as any))
   );
 
   const itemsByCat = CATS.reduce((acc, cat) => {
@@ -74,8 +76,28 @@ export default function WardrobeScreen() {
 
         {tab === 'pieces' ? (
           <>
+            {/* Category type filter */}
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, gap: 8, paddingTop: 14, paddingBottom: 4 }}>
+              {([['tout', 'Tout'] as const, ...CATS.map(c => [c, CATEGORY_META[c].label] as const)]).map(([id, label]) => (
+                <TouchableOpacity
+                  key={id}
+                  onPress={() => setActiveCat(id)}
+                  activeOpacity={0.75}
+                  style={{
+                    paddingHorizontal: 16, paddingVertical: 8, borderRadius: 12,
+                    backgroundColor: activeCat === id ? theme.orange : theme.paper,
+                    ...((activeCat !== id) ? theme.shadow : {}),
+                  }}
+                >
+                  <Text style={{ fontSize: 13, fontWeight: '700', color: activeCat === id ? '#fff' : theme.ink2 }}>
+                    {label}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+
             {/* Occasion filter */}
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, gap: 8, paddingVertical: 12 }}>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, gap: 8, paddingVertical: 10 }}>
               {occs.map(o => (
                 <TouchableOpacity
                   key={o}

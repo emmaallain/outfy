@@ -170,10 +170,10 @@ export default function HomeScreen() {
         </>
       )}
 
-      {/* Le fil des amies */}
+      {/* Le fil des ami·es */}
       {feed.length > 0 && (
         <>
-          <SectionHead title="Le fil de tes amies" action="Voir tout" onAction={() => router.push('/(tabs)/profile')} theme={theme} />
+          <SectionHead title="Le fil de tes ami·es" action="Voir tout" onAction={() => router.push('/(tabs)/profile')} theme={theme} />
           <View style={{ paddingHorizontal: 20, gap: 10 }}>
             {feed.slice(0, 5).map((activity: any) => (
               <View key={activity.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: theme.paper, borderRadius: 18, padding: 11, ...theme.shadow }}>
@@ -201,14 +201,14 @@ export default function HomeScreen() {
         </>
       )}
 
-      {/* Empty state quand pas d'amies */}
+      {/* Empty state quand pas d'ami·es */}
       {feed.length === 0 && (
         <View style={{ paddingHorizontal: 20, marginTop: 8 }}>
-          <SectionHead title="Le fil de tes amies" theme={theme} />
+          <SectionHead title="Le fil de tes ami·es" theme={theme} />
           <View style={{ backgroundColor: theme.paper, borderRadius: 20, padding: 24, alignItems: 'center', gap: 10, ...theme.shadow }}>
             <Ionicons name="people-outline" size={36} color={theme.ink3} />
             <Text style={{ fontSize: 14, color: theme.ink2, textAlign: 'center', lineHeight: 20 }}>
-              Invite tes amies pour voir leur garde-robe ici.
+              Invite tes ami·es pour voir leur garde-robe ici.
             </Text>
           </View>
         </View>
