@@ -27,11 +27,22 @@ const webStorage = {
 const authStorage = isWeb ? webStorage : AsyncStorage;
 const persistSession = !isWeb || hasWindow;
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+const clientOptions: any = {
   auth: {
     storage: authStorage,
     autoRefreshToken: true,
     persistSession,
     detectSessionInUrl: false,
   },
-});
+};
+
+if (!hasWindow) {
+  try {
+    const ws = require('ws');
+    clientOptions.realtime = { transport: ws };
+  } catch {
+    // ws not available, skip
+  }
+}
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, clientOptions);
