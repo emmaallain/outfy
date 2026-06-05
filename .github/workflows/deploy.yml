@@ -47,7 +47,6 @@ jobs:
         with:
           github_token: ${{ secrets.GH_PAGES_TOKEN }}
           publish_dir: ./dist
-          cname: app.example.com
 
       - name: Upload build artifacts on failure
         if: failure()
