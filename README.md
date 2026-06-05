@@ -1,6 +1,6 @@
 # Outfy — Application React Native
 
-Garde-robe intelligente : composer ses tenues dans son lit, scanner ses pièces, partager avec ses amies.
+Garde-robe intelligente : composer ses tenues dans son lit, scanner ses pièces, partager avec ses amies .
 
 ## Stack
 
