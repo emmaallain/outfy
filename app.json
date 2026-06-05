@@ -32,8 +32,7 @@
     },
     "web": {
       "bundler": "metro",
-      "output": "static",
-      "basePath": "/outfy/"
+      "output": "static"
     },
     "plugins": [
       "expo-router",
