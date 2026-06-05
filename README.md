@@ -20,6 +20,23 @@ cp .env.example .env.local
 npx expo start
 ```
 
+## Déploiement
+
+L'app est hébergée sur **Vercel** à https://outfy-npdc.vercel.app
+
+Chaque push sur `main` déclenche un redéploiement automatique. La config Vercel est dans `vercel.json` :
+
+```json
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist"
+}
+```
+
+L'app web (Expo Web) est générée dans le dossier `dist/` via `expo export --platform web`.
+
+**Accès mobile** : scan le QR code ou tape l'URL directement sur ton téléphone.
+
 ## Variables d'environnement (`.env.local`)
 
 ```
